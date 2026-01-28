@@ -5,18 +5,28 @@ import DeleteButton from "./DeleteButton";
 import axios from "axios";
 import CheckButton from "./CheckButton";
 
-export default function TodoLists({todos, editingTodo, setEditingTodo, setEditedText, editedText, getTodos, setTodos, loading, setLoading, error, setError}){
+export default function TodoLists({todos, editingTodo, setEditingTodo, setEditedText, editedText, getTodos, setTodos, loading, setLoading, error, setError, }){
 
 
     const saveEdit = async (id) => {
         try {
+
+            const currentTodo =  todos.find((todo) => todo.todo_id === id);
+            const trimmedText = editedText.trim();
+
+            if(currentTodo.description === trimmedText){
+                setEditingTodo(null);
+                setEditedText("");
+                return;
+            }
             const res = await axios.put(`http://localhost:5000/todos/${id}`,{
                 description: editedText,
             });
             setEditingTodo(null);
             setEditedText("")
             setTodos(todos.map((todo) => todo.todo_id === id ? {...todo,
-                description: editedText} : todo));
+                description: editedText,
+                completed: false} : todo));
         } catch (error) {
             console.error(error.message);
             setError("Failed to update todo. Please try again")
