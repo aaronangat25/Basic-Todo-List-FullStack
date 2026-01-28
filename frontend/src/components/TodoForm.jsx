@@ -2,20 +2,24 @@ import { useEffect, useState } from "react";
 import AddButton from "./AddButton";
 import axios from "axios";
 
-export default function TodoForm({getTodos}){
+export default function TodoForm({todos, getTodos, setTodos, error, setError}){
     
     const [description, setDescription] = useState("");
     
     const onSubmitForm = async (e) => {
         e.preventDefault();
+        if(!description.trim()) return;
         try{
-            await axios.post("http://localhost:5000/todos",{
+            setError(null);
+            const res = await axios.post("http://localhost:5000/todos",{
                 description, completed: false
             })
-        setDescription("")
-        getTodos();
+        setTodos([...todos, res.data]);
+        setDescription("");
+        
         }catch(err){
             console.error(err.message);
+            setError("Failed to add todo. Please try again")
         }
     }
 
